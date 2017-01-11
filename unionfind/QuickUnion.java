@@ -14,7 +14,7 @@ public class QuickUnion {
     
     public int root(int obj) {
         while (obj != id[obj]) {
-            obj = id[obj]
+            obj = id[obj];
         }
         
         return obj;
