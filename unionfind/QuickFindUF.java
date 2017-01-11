@@ -1,3 +1,5 @@
+package unionfind;
+
 public class QuickFindUF {
     private int[] id;
     
@@ -31,5 +33,9 @@ public class QuickFindUF {
                 }
             }
         }
+    }
+    
+    public String toString() {
+        return java.util.Arrays.toString(id);
     }
 }
