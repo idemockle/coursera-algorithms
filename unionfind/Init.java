@@ -38,4 +38,21 @@ public class Init {
         
         return qu;
     }
+    
+    public static WeightedQuickUnion buildWQU(String f_path) {
+        WeightedQuickUnion qu = null;
+        
+        try (Scanner f_scan = new Scanner(Paths.get(f_path))) {
+            
+            qu = new WeightedQuickUnion(f_scan.nextInt());
+            
+            while (f_scan.hasNextInt()) {
+                qu.union(f_scan.nextInt(), f_scan.nextInt());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        
+        return qu;
+    }
 }
