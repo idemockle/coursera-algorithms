@@ -13,14 +13,11 @@ public class QuickUnion {
     }
     
     public int root(int obj) {
-        int parent = id[obj];
-        int child = obj;
-        while (parent != child) {
-            child = parent;
-            parent = id[child];
+        while (obj != id[obj]) {
+            obj = id[obj]
         }
         
-        return parent;
+        return obj;
     }
     
     public boolean connected(int p, int q) {
