@@ -2,15 +2,12 @@ package unionfind;
 
 public class WeightedQuickUnion extends QuickUnion {
     int[] treeSize;
-    int[] id;
     
     public WeightedQuickUnion (int N) {
-        int idx;
+        super(N);
         
-        id       = new int[N];
         treeSize = new int[N];
-        for (idx = 0; idx < N; idx++) {
-            id[idx] = idx;
+        for (int idx = 0; idx < N; idx++) {
             treeSize[idx] = 1;
         }
     }
@@ -27,7 +24,7 @@ public class WeightedQuickUnion extends QuickUnion {
             parent = root(p);
         }
         
-        id[child] = parent;
+        setID(child, parent);
         treeSize[parent]++;
     }
 }
