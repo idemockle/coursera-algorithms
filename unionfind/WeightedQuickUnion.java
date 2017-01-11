@@ -28,6 +28,6 @@ public class WeightedQuickUnion extends QuickUnion {
         }
         
         id[child] = parent;
-        treeSize[parent]++
+        treeSize[parent]++;
     }
 }
