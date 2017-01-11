@@ -34,4 +34,8 @@ public class QuickUnion {
     public String toString() {
         return java.util.Arrays.toString(id);
     }
+    
+    public void setID(int idx, int val) {
+        id[idx] = val;
+    }
 }
