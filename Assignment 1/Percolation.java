@@ -2,9 +2,9 @@ public class Percolation {
    int[][] parents;
    
    public Percolation(int n) {               // create n-by-n grid, with all sites blocked
-      parents = int[n][n];
+      parents = new int[n][n];
       for (int i = 0, j = 0; i < n; i++, j++) {
-         parents[i][j] = null;
+         parents[i][j] = -1;
       }
    }
    // public    void open(int row, int col)    // open site (row, col) if it is not open already
