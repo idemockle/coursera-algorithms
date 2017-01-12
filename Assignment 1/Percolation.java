@@ -1,6 +1,7 @@
 public class Percolation {
    private int[] parents;
    private int[] treeSize;
+   private int n;
    
    public Percolation(int n) {               // create n-by-n grid, with all sites blocked
       parents = new int[n*n+2];
@@ -16,12 +17,35 @@ public class Percolation {
       }
       treeSize[0] = n+1;
       treeSize[n*n+1] = n+1;
+      this.n = n;
    }
    public void open(int row, int col) { 
       // open site (row, col) if it is not open already
+      int[][] neighbors;
+      int nodeToOpen = get1D(row,col);
+      int nbRow;
+      int nbCol;
       
+      parents[nodeToOpen] = nodeToOpen;
+      
+      neighbors = getNeighbors(row,col);
+      
+      for (int i=0; i<4; i++) {
+         nbRow = neighbors[i][0];
+         nbCol = neighbors[i][1];
+         if (inBounds(nbRow,nbCol) && isOpen(nbRow,nbCol)) {
+            union(nodeToOpen, get1D(nbRow,nbCol));
+         }
+      }
    }   
-   // public boolean isOpen(int row, int col)  // is site (row, col) open?
+   
+   
+   public boolean isOpen(int row, int col) {
+      // is site (row, col) open?
+      return parents[get1D(row,col)] != -1;
+   }  
+   
+   
    // public boolean isFull(int row, int col)  // is site (row, col) full?
    // public     int numberOfOpenSites()       // number of open sites
    // public boolean percolates()              // does the system percolate?
@@ -60,5 +84,30 @@ public class Percolation {
       return root;
    }
    
+   private int get1D(int row, int col){
+      return (row*(n-1) + col);
+   }
+   
+   private int[][] getNeighbors(int row, int col) {
+      int[][] neighbors = new int[4][2];
+      
+      neighbors[0][0] = row-1;
+      neighbors[0][1] = col;
+      neighbors[1][0] = row;
+      neighbors[1][1] = col-1;
+      neighbors[2][0] = row;
+      neighbors[2][1] = col+1;
+      neighbors[3][0] = row+1;
+      neighbors[3][1] = col;
+      
+      return neighbors;
+   }
+   
+   private boolean inBounds(int row, int col) {
+      return    (   row > 0 
+                 && row < n+1
+                 && col > 0
+                 && col < n+1);
+   }
    // public static void main(String[] args)   // test client (optional)
 }
