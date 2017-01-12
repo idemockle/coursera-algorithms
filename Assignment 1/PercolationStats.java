@@ -3,7 +3,7 @@ import java.util.Random;
 // import java.lang.String;
 
 public class PercolationStats {
-   private int[] thresholds;
+   private double[] thresholds;
    private int n;
    private Random rGen = new Random();
    
@@ -18,7 +18,7 @@ public class PercolationStats {
       }
       
       this.n = n;
-      thresholds = new int[trials];
+      thresholds = new double[trials];
       
       for (int i=0; i<trials; i++) {
          field = new Percolation(n);
@@ -31,7 +31,7 @@ public class PercolationStats {
             }
          }
          
-         thresholds[i] = field.numberOfOpenSites();
+         thresholds[i] = (double)field.numberOfOpenSites()/(n*n);
       }
    }
    public double mean() {
@@ -74,9 +74,9 @@ public class PercolationStats {
    
    public static void main(String[] args) {
       PercolationStats runs = new PercolationStats(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
-      System.out.println(String.format("%1$24s","mean") + "= " + runs.mean());
-      System.out.println(String.format("%1$24s","stddev") + "= " + runs.stddev());
-      System.out.println(String.format("%1$24s","95% confidence interval") + "= " + runs.confidenceLo() + ", " + runs.confidenceHi());
+      System.out.println(String.format("%1$-24s","mean") + "= " + runs.mean());
+      System.out.println(String.format("%1$-24s","stddev") + "= " + runs.stddev());
+      System.out.println(String.format("%1$-24s","95% confidence interval") + "= " + runs.confidenceLo() + ", " + runs.confidenceHi());
       
       
    }

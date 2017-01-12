@@ -12,7 +12,7 @@ public class Percolation {
       
       parents = new int[n*n+2];
       treeSize = new int[n*n+2];
-      for (int i = 0, j = 0; i < n; i++, j++) {
+      for (int i = 0, j = 0; i < parents.length; i++, j++) {
          parents[i] = -1;
          treeSize[i] = 1;
       }
@@ -32,11 +32,14 @@ public class Percolation {
       
       if (nodeToOpen > n && nodeToOpen < get1D(n,1)) {
          parents[nodeToOpen] = nodeToOpen;
-      } else if (nodeToOpen <= n) {
-         parents[nodeToOpen] = 0;
       } else {
-         parents[nodeToOpen] = n*n+1;
+         if (nodeToOpen <= n) {
+            parents[nodeToOpen] = 0;
+         } else {
+            parents[nodeToOpen] = n*n+1;
+         }
       }
+      
       
       neighbors = getNeighbors(row,col);
       
@@ -109,7 +112,7 @@ public class Percolation {
    }
    
    private int get1D(int row, int col){
-      return (row*(n-1) + col);
+      return ((row-1)*(n) + col);
    }
    
    private int[][] getNeighbors(int row, int col) {
@@ -133,5 +136,40 @@ public class Percolation {
                  && col > 0
                  && col < n+1);
    }
-   // public static void main(String[] args)   // test client (optional)
+   
+   private int getParents(int row, int col) {
+      return parents[get1D(row,col)];
+   }
+   
+   private int getParents(int idx) {
+      return parents[idx];
+   }
+   
+   public static void main(String[] args) {
+      // test client (optional)
+      Percolation p = new Percolation(2);
+      
+      System.out.println("percolates? "+p.percolates());
+      System.out.println("nOpen? "+p.numberOfOpenSites());
+      System.out.println("open 1 1");
+      p.open(1,1);
+      System.out.println("percolates? "+p.percolates());
+      System.out.println("nOpen? "+p.numberOfOpenSites());
+      System.out.println(p.isOpen(1,1)+" "+p.isOpen(1,2));
+      System.out.println(p.isOpen(2,1)+" "+p.isOpen(2,2));
+      System.out.println(p.getParents(2,1));
+      System.out.println("open 1 2");
+      p.open(1,2);
+      System.out.println("percolates? "+p.percolates());
+      System.out.println("nOpen? "+p.numberOfOpenSites());
+      System.out.println(p.getParents(0));
+      System.out.println(p.getParents(1,1)+" "+p.getParents(2));
+      System.out.println(p.getParents(3)+" "+p.getParents(4));
+      System.out.println(p.getParents(5));
+      
+      // System.out.println(p.get1D(1,1)+" "+p.get1D(1,2)+" "+p.get1D(2,1)+" "+p.get1D(2,2));
+      // System.out.println("n = "+p.n);
+      
+      
+   }
 }
