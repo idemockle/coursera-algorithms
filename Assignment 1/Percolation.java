@@ -4,10 +4,12 @@ public class Percolation {
    public Percolation(int n) {               // create n-by-n grid, with all sites blocked
       parents = new int[n*n+2];
       for (int i = 0, j = 0; i < n; i++, j++) {
-         if (i <= n) parents[i] = 0;
+         if (i <= n) 
+            parents[i] = 0;
          else if (i >= n*(n-1)+1)
             parents[i] = n*n+1;
-         else parents[i] = -1;
+         else 
+            parents[i] = -1;
       }
    }
    public void open(int row, int col) { 
