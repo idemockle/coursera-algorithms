@@ -5,6 +5,11 @@ public class Percolation {
    
    public Percolation(int n) {               
       // create n-by-n grid, with all sites blocked
+      
+      if (n<=0) {
+         throw new java.lang.IllegalArgumentException();
+      }
+      
       parents = new int[n*n+2];
       for (int i = 0, j = 0; i < n; i++, j++) {
          if (i <= n) 
