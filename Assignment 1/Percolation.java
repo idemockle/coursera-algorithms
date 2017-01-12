@@ -6,8 +6,8 @@ public class Percolation {
       for (int i = 0, j = 0; i < n; i++, j++) {
          if (i <= n) parents[i] = 0;
          else if (i >= n*(n-1)+1)
-            parents[i] = n**2+1;
-         else parents = -1;
+            parents[i] = n*n+1;
+         else parents[i] = -1;
       }
    }
    public void open(int row, int col) { 
