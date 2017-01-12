@@ -11,13 +11,14 @@ public class Percolation {
       }
       
       parents = new int[n*n+2];
+      treeSize = new int[n*n+2];
       for (int i = 0, j = 0; i < n; i++, j++) {
          parents[i] = -1;
-         treeSize[i] = 0;
+         treeSize[i] = 1;
       }
       
-      treeSize[0] = 1;
-      treeSize[n*n+1] = 1;
+      // treeSize[0] = 1;
+      // treeSize[n*n+1] = 1;
       parents[0] = 0;
       parents[n*n+1] = n*n+1;
       this.n = n;
@@ -70,7 +71,7 @@ public class Percolation {
    
    public boolean percolates() {
       // does the system percolate?
-      return (findRoot(0) == findRoot(n*n+2));
+      return (findRoot(0) == findRoot(n*n+1));
    }
    
    private void union(int p, int q) {

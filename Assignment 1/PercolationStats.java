@@ -5,7 +5,7 @@ import java.util.Random;
 public class PercolationStats {
    private int[] thresholds;
    private int n;
-   private Random rGen;
+   private Random rGen = new Random();
    
    public PercolationStats(int n, int trials) {
       // perform trials independent experiments on an n-by-n grid
