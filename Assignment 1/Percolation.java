@@ -3,7 +3,8 @@ public class Percolation {
    private int[] treeSize;
    private int n;
    
-   public Percolation(int n) {               // create n-by-n grid, with all sites blocked
+   public Percolation(int n) {               
+      // create n-by-n grid, with all sites blocked
       parents = new int[n*n+2];
       for (int i = 0, j = 0; i < n; i++, j++) {
          if (i <= n) 
@@ -39,16 +40,30 @@ public class Percolation {
       }
    }   
    
-   
    public boolean isOpen(int row, int col) {
       // is site (row, col) open?
       return parents[get1D(row,col)] != -1;
    }  
    
+   public boolean isFull(int row, int col) { 
+      // is site (row, col) full?
+      return (findRoot(0) == findRoot(get1D(row,col)));
+   }
    
-   // public boolean isFull(int row, int col)  // is site (row, col) full?
-   // public     int numberOfOpenSites()       // number of open sites
-   // public boolean percolates()              // does the system percolate?
+   public int numberOfOpenSites() {
+      int nOpen = 0;
+      for (int i = 1; i<parents.length-1; i++) {
+         if (parents[i] != -1) {
+            nOpen++;
+         }
+      }
+      return nOpen;
+   }
+   
+   public boolean percolates() {
+      // does the system percolate?
+      return (findRoot(0) == findRoot(n*n+2));
+   }
    
    private void union(int p, int q) {
       int child;
