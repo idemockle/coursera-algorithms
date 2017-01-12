@@ -27,10 +27,10 @@ public class Percolation {
    // public boolean percolates()              // does the system percolate?
    
    private void union(int p, int q) {
-      int child
-      int parent
+      int child;
+      int parent;
       
-      if treeSize[p] >= treeSize[q] {
+      if (treeSize[p] >= treeSize[q]) {
          child = root(q);
          parent = root(p);
       } else {
