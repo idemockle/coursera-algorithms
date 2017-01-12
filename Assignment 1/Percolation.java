@@ -12,17 +12,14 @@ public class Percolation {
       
       parents = new int[n*n+2];
       for (int i = 0, j = 0; i < n; i++, j++) {
-         if (i <= n) 
-            parents[i] = 0;
-         else if (i >= n*(n-1)+1)
-            parents[i] = n*n+1;
-         else 
-            parents[i] = -1;
-         
-         treeSize[i] = 1;
+         parents[i] = -1;
+         treeSize[i] = 0;
       }
-      treeSize[0] = n+1;
-      treeSize[n*n+1] = n+1;
+      
+      treeSize[0] = 1;
+      treeSize[n*n+1] = 1;
+      parents[0] = 0;
+      parents[n*n+1] = n*n+1;
       this.n = n;
    }
    public void open(int row, int col) { 
@@ -32,7 +29,13 @@ public class Percolation {
       int nbRow;
       int nbCol;
       
-      parents[nodeToOpen] = nodeToOpen;
+      if (nodeToOpen > n && nodeToOpen < get1D(n,1)) {
+         parents[nodeToOpen] = nodeToOpen;
+      } else if (nodeToOpen <= n) {
+         parents[nodeToOpen] = 0;
+      } else {
+         parents[nodeToOpen] = n*n+1;
+      }
       
       neighbors = getNeighbors(row,col);
       
