@@ -31,22 +31,33 @@ public class Percolation {
       int parent;
       
       if (treeSize[p] >= treeSize[q]) {
-         child = root(q);
-         parent = root(p);
+         child = findRoot(q);
+         parent = findRoot(p);
       } else {
-         child = root(p);
-         parent = root(q);
+         child = findRoot(p);
+         parent = findRoot(q);
       }
       
       parents[child] = parent;
       treeSize[parent] += treeSize[child];
    }
    
-   private int root(int i) {
-      while (parents[i] != i)
-         i = parents[i];
+   private int findRoot(int nodeIn) {
+      int root;
+      int currNode = nodeIn;
       
-      return i;
+      while (parents[currNode] != currNode)
+         currNode = parents[currNode];
+      
+      root = currNode;
+      
+      currNode = nodeIn;
+      while (parents[currNode] != currNode) {
+         parents[currNode] = root;
+         currNode = parents[currNode];
+      }
+      
+      return root;
    }
    
    // public static void main(String[] args)   // test client (optional)
