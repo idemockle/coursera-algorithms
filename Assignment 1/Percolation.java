@@ -1,5 +1,6 @@
 public class Percolation {
-   int[] parents;
+   private int[] parents;
+   private int[] treeSize;
    
    public Percolation(int n) {               // create n-by-n grid, with all sites blocked
       parents = new int[n*n+2];
@@ -10,7 +11,11 @@ public class Percolation {
             parents[i] = n*n+1;
          else 
             parents[i] = -1;
+         
+         treeSize[i] = 1;
       }
+      treeSize[0] = n+1;
+      treeSize[n*n+1] = n+1;
    }
    public void open(int row, int col) { 
       // open site (row, col) if it is not open already
@@ -20,6 +25,29 @@ public class Percolation {
    // public boolean isFull(int row, int col)  // is site (row, col) full?
    // public     int numberOfOpenSites()       // number of open sites
    // public boolean percolates()              // does the system percolate?
-
+   
+   private void union(int p, int q) {
+      int child
+      int parent
+      
+      if treeSize[p] >= treeSize[q] {
+         child = root(q);
+         parent = root(p);
+      } else {
+         child = root(p);
+         parent = root(q);
+      }
+      
+      parents[child] = parent;
+      treeSize[parent] += treeSize[child];
+   }
+   
+   private int root(int i) {
+      while (parents[i] != i)
+         i = parents[i];
+      
+      return i;
+   }
+   
    // public static void main(String[] args)   // test client (optional)
 }
