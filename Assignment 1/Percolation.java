@@ -137,11 +137,11 @@ public class Percolation {
                  && col < n+1);
    }
    
-   private int getParents(int row, int col) {
+   public int getParents(int row, int col) {
       return parents[get1D(row,col)];
    }
    
-   private int getParents(int idx) {
+   public int getParents(int idx) {
       return parents[idx];
    }
    
