@@ -1,3 +1,5 @@
+import java.nio.file.*;
+
 public class FixedStringStack {
   private String[] items;
   private int top;
@@ -24,5 +26,23 @@ public class FixedStringStack {
   
   public int size() {
     return top+1;
+  }
+  
+  public static void main(String[] args) {
+    Path file = Paths.get(args[0]);
+    FixedStringStack stack = new FixedStringStack(100);
+    
+    try (java.io.BufferedReader reader = Files.newBufferedReader(file)) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        String[] words = line.split("\\s");
+        for (String word : words) {
+          if (word.equals("-")) System.out.print(stack.pop() + " ");
+          else             stack.push(word);
+        }
+      }
+    } catch (java.io.IOException x) {
+      System.err.format("IOException: %s%n", x);
+    }
   }
 }
