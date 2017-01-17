@@ -1,7 +1,7 @@
 public class StackOfStrings {
-  String[] stack;
+  private String[] stack;
   
-  public StackofStrings() {
+  public StackOfStrings() {
     //create an empty stack
     stack = new String[0];
   }
@@ -20,9 +20,15 @@ public class StackOfStrings {
   
   public String pop() {
     //remove and return the string most recently added
-    
+    String popped = stack[stack.length];
+    String[] new_stack = new String[stack.length-1];
+    System.arraycopy(stack, 0, new_stack, 0, stack.length-1);
+    stack = new_stack;
+    return popped;
   }
   
-  public boolean isEmpty()
-  private int size()
+  public boolean isEmpty() {
+    if (stack.length == 0) return true;
+    else return false;
+  }
 }
