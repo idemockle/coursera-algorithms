@@ -1,3 +1,5 @@
+import java.nio.file.*;
+
 public class StackOfStrings {
   private String[] stack;
   
@@ -30,5 +32,23 @@ public class StackOfStrings {
   public boolean isEmpty() {
     if (stack.length == 0) return true;
     else return false;
+  }
+  
+  public static void main(String[] args) {
+    Path file = Paths.get(args[0]);
+    StackOfStrings stack = new StackOfStrings();
+    
+    try (java.io.BufferedReader reader = Files.newBufferedReader(file)) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        String[] words = line.split("\\s");
+        for (String word : words) {
+          if (word == "-") System.out.print(stack.pop());
+          else             stack.push(word);
+        }
+      }
+    } catch (java.io.IOException x) {
+      System.err.format("IOException: %s%n", x);
+    }
   }
 }
