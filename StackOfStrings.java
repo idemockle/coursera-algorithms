@@ -43,7 +43,7 @@ public class StackOfStrings {
       while ((line = reader.readLine()) != null) {
         String[] words = line.split("\\s");
         for (String word : words) {
-          if (word.equals("-")) System.out.print(stack.pop());
+          if (word.equals("-")) System.out.print(stack.pop() + " ");
           else             stack.push(word);
         }
       }
