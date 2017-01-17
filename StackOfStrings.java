@@ -22,7 +22,7 @@ public class StackOfStrings {
   
   public String pop() {
     //remove and return the string most recently added
-    String popped = stack[stack.length];
+    String popped = stack[stack.length-1];
     String[] new_stack = new String[stack.length-1];
     System.arraycopy(stack, 0, new_stack, 0, stack.length-1);
     stack = new_stack;
@@ -43,7 +43,7 @@ public class StackOfStrings {
       while ((line = reader.readLine()) != null) {
         String[] words = line.split("\\s");
         for (String word : words) {
-          if (word == "-") System.out.print(stack.pop());
+          if (word.equals("-")) System.out.print(stack.pop());
           else             stack.push(word);
         }
       }
