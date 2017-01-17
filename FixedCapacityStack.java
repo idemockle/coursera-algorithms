@@ -1,20 +1,20 @@
 import java.nio.file.*;
 
-public class FixedStringStack {
-  private String[] items;
+public class FixedCapacityStack<Item> {
+  private Item[] items;
   private int top;
   
-  public FixedStringStack(int cap) {
-    items = new String[cap];
+  public FixedCapacityStack(int cap) {
+    items = (Item[]) new Object[cap];
     top = -1;
   }
   
-  public void push(String item) {
+  public void push(Item item) {
     top++;
     items[top] = item;
   }
   
-  public String pop() {
+  public Item pop() {
     top--;
     return items[top+1];
   }
@@ -30,7 +30,7 @@ public class FixedStringStack {
   
   public static void main(String[] args) {
     Path file = Paths.get(args[0]);
-    FixedStringStack stack = new FixedStringStack(100);
+    FixedCapacityStack<String> stack = new FixedCapacityStack<String>(100);
     
     try (java.io.BufferedReader reader = Files.newBufferedReader(file)) {
       String line = null;
