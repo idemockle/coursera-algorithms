@@ -59,6 +59,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    }
    
    public Item sample() {
+      if (N == 0) {
+         throw new java.util.NoSuchElementException();
+      }
       return getItem(StdRandom.uniform(N));
    }
    
