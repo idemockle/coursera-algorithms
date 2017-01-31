@@ -22,23 +22,23 @@ public class BruteCollinearPoints {
             }
         }
         for (int i = 0; i < points.length-1; i++) {
-            for (int j = 1; j < points.length; j++) {
+            for (int j = i+1; j < points.length; j++) {
                 if (points[i].compareTo(points[j]) == 0) {
                     throw new java.lang.IllegalArgumentException();
                 }
             }
         }
-        this.points = points;
+        this.points = java.util.Arrays.copyOf(points, points.length);
         }
             
     public int numberOfSegments() {
         int countsegs = 0;
         for (int p = 0; p < points.length - 3; p++) {
-            for (int q = 1; p < points.length - 2; q++) {
-                for (int r = 2; p < points.length - 1; r++) {
-                    for (int s = 3; p < points.length; s++){
-                        if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) &&
-                            points[p].slopeTo(points[q]) == points[p].slopeTo(points[s])) {
+            for (int q = p+1; q < points.length - 2; q++) {
+                for (int r = q+1; r < points.length - 1; r++) {
+                    for (int s = r+1; s < points.length; s++){
+                        if (Double.compare(points[p].slopeTo(points[q]), points[p].slopeTo(points[r])) == 0 &&
+                            Double.compare(points[p].slopeTo(points[q]), points[p].slopeTo(points[s])) == 0) {
                             countsegs++;
                         }
                     }
@@ -53,11 +53,11 @@ public class BruteCollinearPoints {
         int idx = 0;
         Point[] currentPoints = new Point[4];
         for (int p = 0; p < points.length - 3; p++) {
-            for (int q = 1; p < points.length - 2; q++) {
-                for (int r = 2; p < points.length - 1; r++) {
-                    for (int s = 3; p < points.length; s++){
-                        if (points[p].slopeTo(points[q]) == points[p].slopeTo(points[r]) &&
-                            points[p].slopeTo(points[q]) == points[p].slopeTo(points[s])) {
+            for (int q = p+1; q < points.length - 2; q++) {
+                for (int r = q+1; r < points.length - 1; r++) {
+                    for (int s = r+1; s < points.length; s++){
+                        if (Double.compare(points[p].slopeTo(points[q]), points[p].slopeTo(points[r])) == 0 &&
+                            Double.compare(points[p].slopeTo(points[q]), points[p].slopeTo(points[s])) == 0) {
                             currentPoints[0] = points[p];
                             currentPoints[1] = points[q];
                             currentPoints[2] = points[r];
