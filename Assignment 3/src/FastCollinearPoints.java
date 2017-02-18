@@ -40,28 +40,12 @@ public class FastCollinearPoints {
                     sameSlopeCounter++;
                 } else if (sameSlopeCounter >= 3) {
                     collinCounter++;
-                    aux[0] = null;
-                    for (int j = 1; j <= sameSlopeCounter; j++) {
-                        aux[i-j] = null;
-                    }
                     sameSlopeCounter = 1;
                 } else {
                     sameSlopeCounter = 1;
                 }
             }
-            int numNull = 0;
-            for (Point a : aux) {
-                if (a == null) {
-                    numNull++;
-                }
-            }
-            Point[] newAux = new Point[aux.length-numNull];
-            int newAuxIdx = 0;
-            for (Point a : aux) {
-                if (a != null) {
-                    newAux[newAuxIdx++] = a;
-                }
-            }
+            Point[] newAux = java.util.Arrays.copyOfRange(aux, 1, aux.length);
             aux = newAux;
         }
         return collinCounter;
@@ -86,12 +70,10 @@ public class FastCollinearPoints {
                 } else if (sameSlopeCounter >= 3 && prevSlope != Double.NEGATIVE_INFINITY) {
                     Point[] collinPoints = new Point[sameSlopeCounter + 1];
                     collinPoints[0] = p;
-                    aux[0] = null;
+                    java.util.Arrays.sort(collinPoints);
                     for (int j = 1; j <= sameSlopeCounter; j++) {
                         collinPoints[j] = aux[i-j];
-                        aux[i-j] = null;
                     }
-                    java.util.Arrays.sort(collinPoints);
                     segmentsOut[segIdx] = new LineSegment(collinPoints[0], collinPoints[collinPoints.length-1]);
                     segIdx++;
                     sameSlopeCounter = 1;
@@ -99,19 +81,7 @@ public class FastCollinearPoints {
                     sameSlopeCounter = 1;
                 }
             }
-            int numNull = 0;
-            for (Point a : aux) {
-                if (a == null) {
-                    numNull++;
-                }
-            }
-            Point[] newAux = new Point[aux.length-numNull];
-            int newAuxIdx = 0;
-            for (int a = 0; a<aux.length; a++) {
-                if (aux[a] != null) {
-                    newAux[newAuxIdx++] = aux[a];
-                }
-            }
+            Point[] newAux = java.util.Arrays.copyOfRange(aux, 1, aux.length);
             aux = newAux;
         }
         return segmentsOut;
