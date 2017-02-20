@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class Board {
-    private int[][] board;
+    private final int[][] board;
     
     public Board(int[][] blocks){
         // construct a board from an n-by-n array of blocks
