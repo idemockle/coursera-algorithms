@@ -63,7 +63,11 @@ public class Board {
     public Board twin() {
         // a board that is obtained by exchanging any pair of blocks
         int[][] twinBoard = new int[dimension()][dimension()];
-        System.arraycopy(board, 0, twinBoard, 0, dimension());
+        for (int i = 0; i < dimension(); i++) {
+            for (int j = 0; j < dimension(); j++) {
+                twinBoard[i][j] = board[i][j];
+            }
+        }
         twinBoard[0][0] = board[0][1];
         twinBoard[0][1] = board[0][0];
         return new Board(twinBoard);
@@ -72,7 +76,7 @@ public class Board {
     @Override
     public boolean equals(Object y){
         // does this board equal y?
-        if (this == y)                  return true;
+//        if (this == y)                  return true;
         if (y == null)                  return false;
         if (getClass() != y.getClass()) return false;
         
