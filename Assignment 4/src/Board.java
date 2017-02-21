@@ -68,8 +68,13 @@ public class Board {
                 twinBoard[i][j] = board[i][j];
             }
         }
-        twinBoard[0][0] = board[0][1];
-        twinBoard[0][1] = board[0][0];
+        if (board[0][1] != 0 && board[0][0] != 0) {
+            twinBoard[0][0] = board[0][1];
+            twinBoard[0][1] = board[0][0];
+        } else {
+            twinBoard[1][0] = board[0][1];
+            twinBoard[1][1] = board[0][0];
+        }
         return new Board(twinBoard);
     }
     
@@ -89,7 +94,6 @@ public class Board {
     }
 
     private int goalBoard(int r, int c) {
-        // gets goalBoa
         int n = dimension();
         
         if (r == c && r == n-1) {
@@ -112,14 +116,19 @@ public class Board {
     
     @Override
     public String toString() {
-        String res = "";
+        int ndigits;
+        
+        if (dimension() > 10)     { ndigits = 3; }
+        else                      { ndigits = 2; }
+        
+        String res = dimension() + "\n";
         for (int i = 0; i < dimension(); i++) {
             for (int j = 0; j < dimension(); j++) {
                 if (j == dimension() - 1 &&
                     i != dimension() - 1) {
-                    res = res + board[i][j] + "\n";
+                    res = res + String.format("%1$" + ndigits + "d", board[i][j]) + "\n";
                 } else {
-                    res = res + board[i][j] + " ";
+                    res = res + String.format("%1$" + ndigits + "d", board[i][j]) + " ";
                 }
             }
         }
@@ -245,12 +254,13 @@ public class Board {
 //        System.out.println("Hamming Distance = " + b.hamming());
 //        System.out.println("Manhattan Distance = " + b.manhattan());
 
-        int[][] a;
-        a = new int[][]{{1, 2, 3, 4},
-                        {5, 6, 8, 7},
-                        {10,9, 11,15},
-                        {12,13,14,0}};
-        Board A = new Board(a);
+//        a = new int[][]{{1, 2, 3, 4},
+//                        {5, 6, 8, 7},
+//                        {10,9, 11,15},
+//                        {12,13,14,0}};
+        Board A = new Board( new int[][]{ {8, 1, 3},
+                                          {4, 2, 0},
+                                          {7, 6, 5}} );
         for (Board n : A.neighbors()) {
             System.out.println(n + "\n");
         }
