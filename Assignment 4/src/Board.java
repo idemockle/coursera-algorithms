@@ -72,8 +72,8 @@ public class Board {
             twinBoard[0][0] = board[0][1];
             twinBoard[0][1] = board[0][0];
         } else {
-            twinBoard[1][0] = board[0][1];
-            twinBoard[1][1] = board[0][0];
+            twinBoard[1][0] = board[1][1];
+            twinBoard[1][1] = board[1][0];
         }
         return new Board(twinBoard);
     }
