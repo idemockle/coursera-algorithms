@@ -42,7 +42,7 @@ public class PointSET {
      */
     public void draw() {
 //        StdDraw.enableDoubleBuffering();
-        StdDraw.setPenRadius(.02);
+//        StdDraw.setPenRadius(.02);
         
         Iterator<Point2D> iter = pointSet.iterator();
         
