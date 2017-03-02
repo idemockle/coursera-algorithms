@@ -2,6 +2,7 @@ import java.util.TreeSet;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
+import java.util.Iterator;
 
 public class PointSET {
     private TreeSet<Point2D> pointSet;
@@ -41,22 +42,121 @@ public class PointSET {
      */
     public void draw() {
 //        StdDraw.enableDoubleBuffering();
-        for (Point2D p : pointSet) {
-            StdDraw.point(p.x(), p.y());
+        StdDraw.setPenRadius(.02);
+        
+        Iterator<Point2D> iter = pointSet.iterator();
+        
+        Point2D currPoint = iter.next();
+        double xMin = currPoint.x();
+        double xMax = currPoint.x();
+        double yMin = currPoint.y();
+        double yMax = currPoint.y();
+        
+        while (iter.hasNext()) {
+            currPoint = iter.next();
+            if (currPoint.x() < xMin) { xMin = currPoint.x(); }
+            if (currPoint.x() > xMax) { xMax = currPoint.x(); }
+            if (currPoint.y() < yMin) { yMin = currPoint.y(); }
+            if (currPoint.y() > yMax) { yMax = currPoint.y(); }
         }
-//        StdDraw.show();
+        
+        double xRange = xMax - xMin;
+        double yRange = yMax - yMin;
+        
+        StdDraw.setXscale(xMin - xRange/20, xMax + xRange/20);
+        StdDraw.setYscale(yMin - yRange/20, yMax + yRange/20);
+        pointSet.forEach( p -> StdDraw.point(p.x(), p.y()) );
     }
     
-//    public Iterable<Point2D> range(RectHV rect)             // all points that are inside the rectangle 
-//    public           Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
+    /**
+     * all points that are inside the rectangle 
+     * @param rect - Rectangle to find points in
+     * @return Iterable which iterates through Points inside rectangle
+     */
+    public Iterable<Point2D> range(RectHV rect) {
+        return new rangeIterable(rect);
+    }
+    
+    /**
+     * a nearest neighbor in the set to point p; null if the set is empty
+     * @param p - the point to find the nearest neighbor of
+     * @return point in PointSET which is closed to p
+     */
+    public Point2D nearest(Point2D p) {
+        Point2D closest = null;
+        double closestDist = Double.POSITIVE_INFINITY;
+        for (Point2D setPoint : pointSet) {
+            double dist = setPoint.distanceTo(p);
+            if (dist < closestDist) {
+                closest = setPoint;
+                closestDist = dist;
+            }
+        }
+        return closest;
+    }
+    
+    private class rangeIterable implements Iterable<Point2D> {
+        RectHV rect;
+        
+        public rangeIterable(RectHV rect) {
+            this.rect = rect;
+        }
+        
+        public Iterator<Point2D> iterator() {
+            return new rangeIterator(rect);
+        }
+        
+        private class rangeIterator implements Iterator<Point2D> {
+            Iterator<Point2D> iter;
+            RectHV rect;
+            Point2D nextPoint;
+            
+            public rangeIterator(RectHV rect) {
+                iter = PointSET.this.pointSet.iterator();
+                this.rect = rect;
+                nextPoint = null;
+            }
+            
+            public boolean hasNext() { 
+                if (nextPoint != null) {
+                    return true;
+                }
+                while (iter.hasNext()) {
+                    Point2D p = iter.next();
+                    if (rect.contains(p)) {
+                        nextPoint = p;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            public Point2D next() {
+                if (hasNext()) {
+                    Point2D res = nextPoint;
+                    nextPoint = null;
+                    return res;
+                }
+                throw new java.util.NoSuchElementException();
+            }
+        }
+    }
+    
     public static void main(String[] args) {
         PointSET p = new PointSET();
-        StdDraw.setXscale(1, 5);
-        StdDraw.setYscale(2, 5);
-        p.insert(new Point2D(1,2));
+        RectHV r = new RectHV(1, 1, 3, 5);
+//        StdDraw.setPenRadius(.02);
+//        StdDraw.point(2,2);
+//        
+        p.insert(new Point2D(0,0));
+        p.insert(new Point2D(2,0));
+        p.insert(new Point2D(2,3));
         p.insert(new Point2D(3,4));
-        p.insert(new Point2D(5,5));
-        p.draw();
+        
+        System.out.println(p.nearest(new Point2D(5,5)));
+//        for (Point2D point : p.range(r)) {
+//            System.out.println(point);
+//        }
     }
     
 }
