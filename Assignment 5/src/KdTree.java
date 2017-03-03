@@ -1,7 +1,8 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.RectHV;
 import java.util.Iterator;
-import java.util.Stack;
+import java.util.LinkedList;
 
 public class KdTree {
     private PointBST tree;
@@ -14,35 +15,123 @@ public class KdTree {
     public int size() { return size; }
     public void insert(Point2D p) { tree.add(p); size++; }
     public boolean contains(Point2D p) { return tree.contains(p); }
+    
+    /**
+     * Draws all of the points to standard draw in black and the subdivisions 
+     * in red (for vertical splits) and blue (for horizontal splits). This 
+     * method need not be efficient—it is primarily for debugging.
+     */
     public void draw() {
-        Iterator<Point2D> iter = tree.iterator();
+        Iterator<PointBST> iter = tree.iterator();
         
-        Point2D currPoint = iter.next();
-        double xMin = currPoint.x();
-        double xMax = currPoint.x();
-        double yMin = currPoint.y();
-        double yMax = currPoint.y();
+        PointBST currBST = iter.next();
+        double xMin = currBST.point.x();
+        double xMax = currBST.point.x();
+        double yMin = currBST.point.y();
+        double yMax = currBST.point.y();
         
         while (iter.hasNext()) {
-            currPoint = iter.next();
-            if (currPoint.x() < xMin) { xMin = currPoint.x(); }
-            if (currPoint.x() > xMax) { xMax = currPoint.x(); }
-            if (currPoint.y() < yMin) { yMin = currPoint.y(); }
-            if (currPoint.y() > yMax) { yMax = currPoint.y(); }
+            currBST = iter.next();
+            if (currBST.point.x() < xMin) { xMin = currBST.point.x(); }
+            if (currBST.point.x() > xMax) { xMax = currBST.point.x(); }
+            if (currBST.point.y() < yMin) { yMin = currBST.point.y(); }
+            if (currBST.point.y() > yMax) { yMax = currBST.point.y(); }
         }
         
         double xRange = xMax - xMin;
         double yRange = yMax - yMin;
         
+        if (Double.compare(xRange, yRange) > 0) {
+            double yMid = (yMax + yMin) / 2.;
+            yRange = xRange;
+            yMin = yMid - yRange / 2.;
+            yMax = yMid + yRange / 2.;
+        } else if (Double.compare(xRange, yRange) < 0) {
+            double xMid = (xMax + xMin) / 2.;
+            xRange = yRange;
+            xMin = xMid - xRange / 2.;
+            xMax = xMid + xRange / 2.;
+        }
+        
         StdDraw.setXscale(xMin - xRange/20, xMax + xRange/20);
         StdDraw.setYscale(yMin - yRange/20, yMax + yRange/20);
-        tree.forEach( p -> StdDraw.point(p.x(), p.y()) );
+        
+        for (PointBST n : tree) {
+            if (n.isVert) { drawVert(n, yMin, yMax); }
+            else          { drawHori(n, xMin, xMax); }
+        }
     }
-//    public Iterable<Point2D> range(RectHV rect)             // all points that are inside the rectangle 
+    
+    private void drawVert(PointBST node, double yMin, double yMax) {
+        if (!node.isVert) { 
+            throw new IllegalArgumentException("node passed to drawVert must be vertical");
+        }
+        
+        PointBST up = node.parent;
+        double[] bounds = {yMin, yMax};
+        int i = 0;
+        while (up != null && i < 2) {
+            if (!up.isVert) {
+                if (isBetween(up.point.y(), yMin, node.point.y())) {
+                    bounds[0] = up.point.y();
+                } else if (isBetween(up.point.y(), node.point.y(), yMax)) {
+                    bounds[1] = up.point.y();
+                }
+                i++;
+            }
+            up = up.parent;
+        }
+        
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenRadius(.005);
+        StdDraw.line(node.point.x(), bounds[0], node.point.x(), bounds[1]);
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(.02);
+        StdDraw.point(node.point.x(), node.point.y());
+    }
+    
+    private void drawHori(PointBST node, double xMin, double xMax) {
+        if (node.isVert) { 
+            throw new IllegalArgumentException("node passed to drawHori must not be vertical");
+        }
+        
+        PointBST up = node.parent;
+        double[] bounds = {xMin, xMax};
+        int i = 0;
+        while (up != null && i < 2) {
+            if (up.isVert) {
+                if (isBetween(up.point.x(), xMin, node.point.x())) {
+                    bounds[0] = up.point.x();
+                } else if (isBetween(up.point.x(), node.point.x(), xMax)) {
+                    bounds[1] = up.point.x();
+                }
+                i++;
+            }
+            up = up.parent;
+        }
+        
+        StdDraw.setPenColor(StdDraw.BLUE);
+        StdDraw.setPenRadius(.005);
+        StdDraw.line(bounds[0], node.point.y(), bounds[1], node.point.y());
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.setPenRadius(.02);
+        StdDraw.point(node.point.x(), node.point.y());
+    }
+    
+    private boolean isBetween(double n, double min, double max) {
+        return (Double.compare(n, min) > 0 && Double.compare(n, max) < 0);
+    }
+    
+    /**
+     * all points that are inside the rectangle 
+     * @param rect - the rectangle to search for points in
+     * @return Iterable which returns the points inside the rectangle
+     */
+//    public Iterable<Point2D> range(RectHV rect)
 //    public           Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty 
     
     
-    private class PointBST implements Iterable<Point2D> {
+    private class PointBST implements Iterable<PointBST> {
         PointBST left;
         PointBST right;
         PointBST parent;
@@ -110,24 +199,24 @@ public class KdTree {
             }
         }
         
-        public Iterator<Point2D> iterator() {
+        public Iterator<PointBST> iterator() {
             return new Iter();
         }
-        private class Iter implements Iterator<Point2D> {
-            Stack<Point2D> stack;
+        private class Iter implements Iterator<PointBST> {
+            LinkedList<PointBST> queue;
 
             public Iter() {
-                stack = new Stack<>();
-                buildStack(PointBST.this);
+                queue = new LinkedList<>();
+                buildQueue(PointBST.this);
             }
 
-            public boolean hasNext() { return !stack.empty(); }
-            public Point2D next() { return stack.pop(); }
+            public boolean hasNext() { return !queue.isEmpty(); }
+            public PointBST next() { return queue.remove(); }
 
-            private void buildStack(PointBST p) {
-                if (p.point != null) { stack.push(p.point); }
-                if (p.left != null) { buildStack(p.left); }
-                if (p.right != null){ buildStack(p.right); }
+            private void buildQueue(PointBST p) {
+                if (p.point != null) { queue.add(p); }
+                if (p.left != null) { buildQueue(p.left); }
+                if (p.right != null){ buildQueue(p.right); }
             }
         }
     }
@@ -135,22 +224,15 @@ public class KdTree {
     public static void main(String[] args) {
         KdTree tree = new KdTree();
         
-        tree.insert(new Point2D(1,2));
-        tree.insert(new Point2D(0,0));
-        tree.insert(new Point2D(3,4));
-        tree.insert(new Point2D(9,2));
-        
-//        System.out.println(tree.tree.point);
-//        System.out.println(tree.tree.right.point);
-//        System.out.println(tree.tree.right.left.point);
-//        System.out.println(tree.tree.right.left.parent.point);
-//        System.out.println(tree.tree.right.left.right);
-//        System.out.println(tree.tree.right.left.left);
-        StdDraw.setPenRadius(.02);
+        tree.insert(new Point2D(.7,.2));
+        tree.insert(new Point2D(.5,.4));
+        tree.insert(new Point2D(.2,.3));
+        tree.insert(new Point2D(.4,.7));
+        tree.insert(new Point2D(.9,.6));
+        tree.insert(new Point2D(.5,.5));
         tree.draw();
-//        for (Point2D p : tree.tree) {
-//            System.out.println(p);
+//        for (PointBST p : tree.tree) {
+//            System.out.println(p.point);
 //        }
-        
     }
 }
