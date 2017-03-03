@@ -12,9 +12,19 @@ public class KdTree {
         tree = new PointBST();
     }
     public boolean isEmpty() { return tree.point == null; }
+    
     public int size() { return size; }
-    public void insert(Point2D p) { tree.add(p); size++; }
-    public boolean contains(Point2D p) { return tree.contains(p); }
+    
+    public void insert(Point2D p) {
+        if (p == null) throw new NullPointerException();
+        tree.add(p);
+        size++;
+    }
+    
+    public boolean contains(Point2D p) { 
+        if (p == null) throw new NullPointerException();
+        return tree.contains(p);
+    }
     
     /**
      * Draws all of the points to standard draw in black and the subdivisions 
@@ -119,7 +129,7 @@ public class KdTree {
     }
     
     private boolean isBetween(double n, double min, double max) {
-        return (Double.compare(n, min) > 0 && Double.compare(n, max) < 0);
+        return (Double.compare(n, min) >= 0 && Double.compare(n, max) <= 0);
     }
     
     /**
@@ -127,9 +137,106 @@ public class KdTree {
      * @param rect - the rectangle to search for points in
      * @return Iterable which returns the points inside the rectangle
      */
-//    public Iterable<Point2D> range(RectHV rect)
-//    public           Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty 
+    public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) throw new NullPointerException();
+        return new rectPoints(rect);
+    }
     
+    private class rectPoints implements Iterable<Point2D> {
+        private RectHV rect;
+        
+        public rectPoints(RectHV rect) { this.rect = rect; }
+        
+        @Override
+        public Iterator<Point2D> iterator() { return new rectPointsIterator(rect); }
+        
+        private class rectPointsIterator implements Iterator<Point2D> {
+            LinkedList<Point2D> queue;
+            
+            public rectPointsIterator(RectHV rect) {
+                queue = new LinkedList<>();
+                buildQueue(KdTree.this.tree, rect);
+            }
+            
+            private void buildQueue(PointBST node, RectHV rect) {
+                if (node.point == null) { return; }
+                
+                RectHV leftR = node.leftRect();
+                RectHV rightR = node.rightRect();
+                
+                if (rect.contains(node.point)) {
+                    queue.add(node.point);
+                    if (node.left != null) { buildQueue(node.left, rect); }
+                    if (node.right != null) { buildQueue(node.right, rect); }
+                } else if (rect.intersects(leftR) && rect.intersects(rightR)) {
+                    if (node.left != null) { buildQueue(node.left, rect); }
+                    if (node.right != null) { buildQueue(node.right, rect); }
+                } else if (rect.intersects(leftR)) {
+                    if (node.left != null) { buildQueue(node.left, rect); }
+                } else {
+                    if (node.right != null) { buildQueue(node.right, rect); }
+                }
+            }
+            
+            @Override
+            public boolean hasNext() { return !queue.isEmpty(); }
+
+            @Override
+            public Point2D next() { return queue.remove(); }
+            
+        }
+        
+    }
+    
+    public Point2D nearest(Point2D p) {
+        if (p == null) throw new NullPointerException();
+        return new NearestFinder(p).nearestPoint;
+    }
+
+    private class NearestFinder {
+        Point2D nearestPoint;
+        double dist;
+        
+        public NearestFinder(Point2D p) {
+            if (KdTree.this.size == 0) {
+                throw new IllegalStateException("KdTree.this.tree is empty.");
+            }
+            dist = Double.POSITIVE_INFINITY;
+            findNearest(p, tree);
+        }
+        
+        private void findNearest(Point2D p, PointBST node) {
+            if (node.point.distanceTo(p) < dist) {
+                dist = node.point.distanceTo(p);
+                nearestPoint = node.point;
+            }
+            
+            RectHV leftRect = node.leftRect();
+            RectHV rightRect = node.rightRect();
+            
+            if (leftRect.contains(p)) {
+                if (node.left != null) { findNearest(p, node.left); }
+                if (Double.compare(dist, rightRect.distanceTo(p)) > 0)
+                    { if (node.right != null) findNearest(p, node.right); }
+            } else if (rightRect.contains(p)) {
+                if (node.right != null) findNearest(p, node.right);
+                if (Double.compare(dist, leftRect.distanceTo(p)) > 0)
+                    { if (node.left != null) findNearest(p, node.left); }
+            } else {
+                if (Double.compare(leftRect.distanceTo(p), rightRect.distanceTo(p)) < 0) {
+                    if (Double.compare(dist, leftRect.distanceTo(p)) > 0)
+                        { if (node.left != null) findNearest(p, node.left); }
+                    if (Double.compare(dist, rightRect.distanceTo(p)) > 0)
+                        { if (node.right != null) findNearest(p, node.right); }
+                } else {
+                    if (Double.compare(dist, rightRect.distanceTo(p)) > 0)
+                        { if (node.right != null) findNearest(p, node.right); }
+                    if (Double.compare(dist, leftRect.distanceTo(p)) > 0)
+                        { if (node.left != null) findNearest(p, node.left); }
+                }
+            }
+        }
+    }
     
     private class PointBST implements Iterable<PointBST> {
         PointBST left;
@@ -137,14 +244,16 @@ public class KdTree {
         PointBST parent;
         Point2D point;
         boolean isVert;
+        boolean isRightChild;
         
         public PointBST() {
             isVert = true;
         }
         
-        public PointBST(PointBST parent, boolean isVert) {
+        public PointBST(PointBST parent, boolean isVert, boolean isRightChild) {
             this.parent = parent;
             this.isVert = isVert;
+            this.isRightChild = isRightChild;
         }
         
         public void add(Point2D p) {
@@ -166,12 +275,12 @@ public class KdTree {
                 
                 if (Double.compare(pDim, pointDim) < 0) {
                     if (left == null) {
-                        left = new PointBST(this, !this.isVert);
+                        left = new PointBST(this, !this.isVert, false);
                     }
                     left.add(p);
                 } else {
                     if (right == null) {
-                        right = new PointBST(this, !this.isVert);
+                        right = new PointBST(this, !this.isVert, true);
                     }
                     right.add(p);
                 }
@@ -199,6 +308,84 @@ public class KdTree {
             }
         }
         
+        public boolean isRoot() { return parent == null; }
+        
+        private RectHV leftRect() {
+            double xMin = Double.NEGATIVE_INFINITY;
+            double yMin = Double.NEGATIVE_INFINITY;
+            double xMax = Double.POSITIVE_INFINITY;
+            double yMax = Double.POSITIVE_INFINITY;
+
+            if (isVert) {
+                xMax = point.x();
+            } else {
+                yMax = point.y();
+            }
+
+            PointBST currNode = this;
+            int stepCount = 0;
+            while (!currNode.isRoot() && stepCount < 3) {
+                if (currNode.isRightChild) {
+                    if (currNode.isVert) {
+                        if (Double.compare(currNode.parent.point.y(), yMin) > 0)
+                            { yMin = currNode.parent.point.y(); }
+                    } else {
+                        if (Double.compare(currNode.parent.point.x(), xMin) > 0)
+                            { xMin = currNode.parent.point.x(); }
+                    }
+                } else {
+                    if (currNode.isVert) {
+                        if (Double.compare(currNode.parent.point.y(), yMax) < 0)
+                            { yMax = currNode.parent.point.y(); }
+                    } else {
+                        if (Double.compare(currNode.parent.point.x(), xMax) < 0)
+                            { xMax = currNode.parent.point.x(); }
+                    }
+                }
+                currNode = currNode.parent;
+                stepCount++;
+            }
+            return new RectHV(xMin, yMin, xMax, yMax);
+        }
+        
+        private RectHV rightRect() {
+            double xMin = Double.NEGATIVE_INFINITY;
+            double yMin = Double.NEGATIVE_INFINITY;
+            double xMax = Double.POSITIVE_INFINITY;
+            double yMax = Double.POSITIVE_INFINITY;
+
+            if (isVert) {
+                xMin = point.x();
+            } else {
+                yMin = point.y();
+            }
+
+            PointBST currNode = this;
+            int stepCount = 0;
+            while (!currNode.isRoot() && stepCount < 3) {
+                if (currNode.isRightChild) {
+                    if (currNode.isVert) {
+                        if (Double.compare(currNode.parent.point.y(), yMin) > 0)
+                            { yMin = currNode.parent.point.y(); }
+                    } else {
+                        if (Double.compare(currNode.parent.point.x(), xMin) > 0)
+                            { xMin = currNode.parent.point.x(); }
+                    }
+                } else {
+                    if (currNode.isVert) {
+                        if (Double.compare(currNode.parent.point.y(), yMax) < 0)
+                            { yMax = currNode.parent.point.y(); }
+                    } else {
+                        if (Double.compare(currNode.parent.point.x(), xMax) < 0)
+                            { xMax = currNode.parent.point.x(); }
+                    }
+                }
+                currNode = currNode.parent;
+                stepCount++;
+            }
+            return new RectHV(xMin, yMin, xMax, yMax);
+        }
+        
         public Iterator<PointBST> iterator() {
             return new Iter();
         }
@@ -223,16 +410,22 @@ public class KdTree {
     
     public static void main(String[] args) {
         KdTree tree = new KdTree();
-        
         tree.insert(new Point2D(.7,.2));
         tree.insert(new Point2D(.5,.4));
         tree.insert(new Point2D(.2,.3));
         tree.insert(new Point2D(.4,.7));
         tree.insert(new Point2D(.9,.6));
-        tree.insert(new Point2D(.5,.5));
         tree.draw();
+        
+        RectHV r = new RectHV(.1, .2, .6, .5);
+        
+        for (Point2D p : tree.range(r)) {
+            System.out.println(p);
+        }
+        
 //        for (PointBST p : tree.tree) {
 //            System.out.println(p.point);
 //        }
+//        System.out.println(tree.size());
     }
 }

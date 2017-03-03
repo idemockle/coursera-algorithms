@@ -22,30 +22,38 @@ public class RangeSearchVisualizer {
     public static void main(String[] args) {
 
         String filename = args[0];
-        In in = new In(filename);
+//        In in = new In(filename);
+
+        KdTree kdtree = new KdTree();
+        kdtree.insert(new Point2D(0, 0));
+        kdtree.insert(new Point2D(0, 1));
+        kdtree.insert(new Point2D(1, 0));
+        kdtree.insert(new Point2D(1, 1));
+        kdtree.insert(new Point2D(.9,.6));
+        kdtree.insert(new Point2D(.6,.9));
 
         StdDraw.enableDoubleBuffering();
 
         // initialize the data structures with N points from standard input
-        PointSET brute = new PointSET();
+//        PointSET brute = new PointSET();
 //        KdTree kdtree = new KdTree();
-        while (!in.isEmpty()) {
-            double x = in.readDouble();
-            double y = in.readDouble();
-            Point2D p = new Point2D(x, y);
+//        while (!in.isEmpty()) {
+//            double x = in.readDouble();
+//            double y = in.readDouble();
+//            Point2D p = new Point2D(x, y);
 //            kdtree.insert(p);
-            brute.insert(p);
-        }
+//            brute.insert(p);
+//        }
 
         double x0 = 0.0, y0 = 0.0;      // initial endpoint of rectangle
         double x1 = 0.0, y1 = 0.0;      // current location of mouse
         boolean isDragging = false;     // is the user dragging a rectangle
 
         // draw the points
-        StdDraw.clear();
-        StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setPenRadius(0.01);
-        brute.draw();
+//        StdDraw.clear();
+//        StdDraw.setPenColor(StdDraw.BLACK);
+//        StdDraw.setPenRadius(0.01);
+        kdtree.draw();
         StdDraw.show();
 
         while (true) {
@@ -75,9 +83,9 @@ public class RangeSearchVisualizer {
                                      Math.max(x0, x1), Math.max(y0, y1));
             // draw the points
             StdDraw.clear();
-            StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.setPenRadius(0.01);
-            brute.draw();
+//            StdDraw.setPenColor(StdDraw.BLACK);
+//            StdDraw.setPenRadius(0.01);
+            kdtree.draw();
 
             // draw the rectangle
             StdDraw.setPenColor(StdDraw.BLACK);
@@ -85,16 +93,22 @@ public class RangeSearchVisualizer {
             rect.draw();
 
             // draw the range search results for brute-force data structure in red
-            StdDraw.setPenRadius(0.03);
-            StdDraw.setPenColor(StdDraw.RED);
-            for (Point2D p : brute.range(rect))
-                p.draw();
+//            StdDraw.setPenRadius(0.03);
+//            StdDraw.setPenColor(StdDraw.RED);
+//            for (Point2D p : brute.range(rect))
+//                p.draw();
 
             // draw the range search results for kd-tree in blue
-            StdDraw.setPenRadius(.02);
-            StdDraw.setPenColor(StdDraw.BLUE);
-            for (Point2D p : brute.range(rect))
+//            StdDraw.setPenRadius(.02);
+//            StdDraw.setPenColor(StdDraw.BLUE);
+            for (Point2D p : kdtree.range(rect)) {
+                StdDraw.setPenRadius(.03);
+                StdDraw.setPenColor(StdDraw.RED);
                 p.draw();
+                StdDraw.setPenRadius(.02);
+                StdDraw.setPenColor(StdDraw.BLUE);
+                p.draw();
+            }
 
             StdDraw.show();
             StdDraw.pause(40);

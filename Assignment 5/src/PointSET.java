@@ -28,14 +28,21 @@ public class PointSET {
      * add the point to the set (if it is not already in the set)
      * @param p - the point to be added
      */
-    public void insert(Point2D p) { pointSet.add(p); }
+    public void insert(Point2D p) { 
+        if (p == null) throw new NullPointerException();
+        pointSet.add(p);
+    }
     
     /**
      * does the set contain point p? 
      * @param p - the point whose presence is checked for
      * @return true if Point2D p is present
      */
-    public boolean contains(Point2D p) { return pointSet.contains(p); }
+    public boolean contains(Point2D p) { 
+        if (p == null) throw new NullPointerException();
+        
+        return pointSet.contains(p);
+    }
     
     /**
      * draw all points to standard draw
@@ -74,6 +81,7 @@ public class PointSET {
      * @return Iterable which iterates through Points inside rectangle
      */
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) throw new NullPointerException();
         return new rangeIterable(rect);
     }
     
@@ -83,6 +91,7 @@ public class PointSET {
      * @return point in PointSET which is closed to p
      */
     public Point2D nearest(Point2D p) {
+        if (p == null) throw new NullPointerException();
         Point2D closest = null;
         double closestDist = Double.POSITIVE_INFINITY;
         for (Point2D setPoint : pointSet) {
